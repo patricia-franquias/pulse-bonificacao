@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1b3d">
+<title>Pulse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0f1b3d;--navy2:#18285a;--navy3:#22367a;--gold:#f5c542;--gold2:#b8901d;--red:#e0262e;--tx:#eef1ff;--tx2:#9aa6d6;--ok:#3ddc6e;--warn:#ffb32f;--bad:#ff4d55}
+*{box-sizing:border-box}html,body{margin:0;background:var(--navy);color:var(--tx);font-family:VT323,ui-monospace,monospace;font-size:21px;line-height:1.15}
+h1,h2,h3,.px{font-family:'Press Start 2P',monospace;font-weight:400;letter-spacing:.02em}
+h1{font-size:14px;margin:0}h2{font-size:12px;margin:0 0 10px;color:var(--gold)}h3{font-size:10px;margin:0}
+button,input{font-family:inherit;font-size:20px}
+.hidden{display:none!important}
+.topo{position:sticky;top:0;background:var(--navy);padding:14px 16px 10px;border-bottom:3px solid var(--navy3);z-index:5;display:flex;align-items:center;gap:10px}
+.topo .moedas{margin-left:auto;color:var(--gold);display:flex;align-items:center;gap:6px}
+main{padding:14px 16px 100px;max-width:640px;margin:0 auto}
+.caixa{background:var(--navy2);border:3px solid var(--navy3);box-shadow:4px 4px 0 #070d22;padding:14px;margin-bottom:14px;border-radius:4px}
+.barra{height:16px;background:#0a1430;border:2px solid #070d22;position:relative;margin:4px 0}
+.barra>i{display:block;height:100%;background:repeating-linear-gradient(90deg,var(--c,var(--gold)) 0 10px,color-mix(in srgb,var(--c,var(--gold)) 80%,#000) 10px 12px)}
+.rot{display:flex;justify-content:space-between;color:var(--tx2);font-size:18px}
+.big{font-family:'Press Start 2P',monospace;font-size:18px;color:var(--gold)}
+.muted{color:var(--tx2)}
+.btn{border:3px solid #070d22;background:var(--gold);color:#1a1300;padding:10px 14px;min-height:44px;cursor:pointer;font-family:'Press Start 2P',monospace;font-size:10px;box-shadow:3px 3px 0 #070d22;border-radius:2px}
+.btn.sec{background:var(--navy3);color:var(--tx)}.btn:disabled{opacity:.45}.btn.full{width:100%}
+nav.base{position:fixed;bottom:0;left:0;right:0;background:#0a1430;border-top:3px solid var(--navy3);display:grid;grid-template-columns:repeat(6,1fr);padding-bottom:env(safe-area-inset-bottom);z-index:10}
+nav.base button{background:none;border:0;color:var(--tx2);min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:15px;cursor:pointer}
+nav.base button.ativo{color:var(--gold)}nav.base svg{width:22px;height:22px}
+.linha{display:flex;gap:10px;align-items:center}
+.item{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:2px dashed #2a3c7d}.item:last-child{border:0}
+.pos{font-family:'Press Start 2P',monospace;font-size:11px;width:30px;color:var(--gold)}
+.eu{background:#22367a66}
+.check{display:flex;gap:10px;align-items:center;padding:8px 0;min-height:44px;cursor:pointer}
+.check input{width:24px;height:24px;accent-color:var(--gold)}
+.card-c{border:3px solid #070d22;padding:12px;margin-bottom:10px;box-shadow:3px 3px 0 #070d22}
+.r-comum{background:#2b3b6e}.r-rara{background:#1f5a7a}.r-epica{background:#5a2f86}.r-lendaria{background:#7a5a10}
+.cad{opacity:.75}
+.fundo{position:fixed;inset:0;background:rgba(5,9,25,.8);z-index:30;display:flex;align-items:flex-end;justify-content:center}
+.modal{background:var(--navy2);border:3px solid var(--gold);width:min(640px,100%);max-height:88vh;overflow:auto;padding:16px;box-shadow:0 -4px 0 #070d22}
+.modal .cab{display:flex;align-items:center;gap:8px;margin-bottom:12px}.modal .cab h2{flex:1;margin:0}
+.x{background:none;border:0;color:var(--tx);min-width:44px;min-height:44px;cursor:pointer;font-size:26px}
+.conta{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;background:#0a1430;padding:8px;border:2px solid #070d22;margin-top:6px;white-space:pre-wrap}
+.aviso{background:#3a2d00;border:2px solid var(--gold2);color:#ffe7a3;padding:8px;margin-bottom:10px}
+.comp{display:flex;height:16px;border:2px solid #070d22;margin:8px 0}
+.leg{display:flex;flex-wrap:wrap;gap:10px;font-size:17px;color:var(--tx2)}.leg i{display:inline-block;width:12px;height:12px;margin-right:4px}
+.bloco{border-top:2px dashed #2a3c7d;padding-top:10px;margin-top:10px}.bloco ul{margin:4px 0 0;padding-left:18px;font-size:18px}
+input.campo{width:100%;padding:10px;background:#0a1430;border:3px solid var(--navy3);color:var(--tx);min-height:48px}
+.toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:var(--gold);color:#1a1300;padding:10px 14px;z-index:60;border:3px solid #070d22;max-width:92vw}
+.toast.erro{background:var(--bad);color:#fff}
+.celebra{text-align:center}.celebra .px{color:var(--gold);font-size:14px;line-height:1.6}
+svg{flex-shrink:0}
+</style>
+</head>
+<body>
+<div id="login" class="hidden"><main style="padding-top:12vh">
+  <div class="caixa"><h1 style="color:var(--gold);line-height:1.6" id="lTitulo">PULSE</h1><p class="muted">Entre com sua matrícula e PIN.</p>
+  <form id="fLogin"><label>Matrícula<input class="campo" name="matricula" inputmode="numeric" autocomplete="username" required></label><br><br>
+  <label>PIN<input class="campo" name="pin" type="password" inputmode="numeric" autocomplete="current-password" required></label><br><br>
+  <button class="btn full" type="submit">ENTRAR</button></form></div></main></div>
+<div id="app" class="hidden">
+  <div class="topo"><h1 id="tTitulo">PULSE</h1><span class="moedas"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5h4.5a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3H15"/></svg><span id="tMoedas">0</span></span></div>
+  <main id="tela"></main>
+  <nav class="base" id="nav"></nav>
+</div>
+<script>
+'use strict';
+const P = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+const ABAS = [
+  ['perfil', 'Perfil', P('<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>')],
+  ['rotinas', 'Rotinas', P('<path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>')],
+  ['ranking', 'Ranking', P('<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/>')],
+  ['conquistas', 'Cards', P('<circle cx="12" cy="8" r="7"/><path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12"/>')],
+  ['loja', 'Loja', P('<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>')],
+  ['niveis', 'Níveis', P('<path d="M12 20V10M18 20V4M6 20v-4"/>')],
+];
+const CAD = P('<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>');
+const $ = (s, el = document) => el.querySelector(s);
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const n1 = (v) => v === null || v === undefined ? '—' : Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const pct = (v) => v === null || v === undefined ? '—' : n1(v) + '%';
+const brl = (v) => v === null || v === undefined ? '—' : 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const intf = (v) => Number(v || 0).toLocaleString('pt-BR');
+const cor = (v) => v === null || v === undefined ? '#5a6699' : v >= 95 ? 'var(--ok)' : v >= 85 ? 'var(--warn)' : 'var(--bad)';
+const barra = (p, c) => `<div class="barra"><i style="width:${Math.max(0, Math.min(100, p || 0))}%;--c:${c || 'var(--gold)'}"></i></div>`;
+const RAR = { comum: 'COMUM', rara: 'RARA', epica: 'ÉPICA', lendaria: 'LENDÁRIA' };
+let aba = 'perfil'; let perfil = null;
+
+async function api(url, opt = {}) {
+  const r = await fetch('/api/app' + url, { method: opt.method || 'GET', headers: opt.body ? { 'Content-Type': 'application/json' } : {}, body: opt.body ? JSON.stringify(opt.body) : undefined, credentials: 'same-origin' });
+  const j = await r.json().catch(() => ({}));
+  if (r.status === 401) { mostrarLogin(); throw new Error(j.erro || 'Faça login'); }
+  if (!r.ok) throw new Error(j.erro || 'Erro');
+  return j;
+}
+function toast(m, erro) { const t = document.createElement('div'); t.className = 'toast' + (erro ? ' erro' : ''); t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
+const tentar = (fn) => async (...a) => { try { await fn(...a); } catch (e) { toast(e.message, true); } };
+function modal(titulo, html, botoes = []) {
+  return new Promise((res) => {
+    const f = document.createElement('div'); f.className = 'fundo';
+    f.innerHTML = `<div class="modal" role="dialog" aria-modal="true"><div class="cab"><h2>${esc(titulo)}</h2><button class="x" aria-label="Fechar">×</button></div><div class="corpo">${html}</div>
+      <div class="linha" style="margin-top:14px;justify-content:flex-end" id="mb"></div></div>`;
+    const fechar = (v) => { f.remove(); res(v); };
+    $('.x', f).onclick = () => fechar(false); f.onclick = (e) => { if (e.target === f) fechar(false); };
+    const k = (e) => { if (e.key === 'Escape' && document.body.lastElementChild === f) { document.removeEventListener('keydown', k); fechar(false); } }; document.addEventListener('keydown', k);
+    for (const b of botoes) { const el = document.createElement('button'); el.className = 'btn' + (b.sec ? ' sec' : ''); el.textContent = b.texto; el.onclick = () => fechar(b.valor); $('#mb', f).appendChild(el); }
+    document.body.appendChild(f);
+  });
+}
+
+function mostrarLogin() { $('#app').classList.add('hidden'); $('#login').classList.remove('hidden'); }
+$('#fLogin').onsubmit = tentar(async (e) => { e.preventDefault(); await api('/login', { method: 'POST', body: Object.fromEntries(new FormData(e.target)) }); iniciar(); });
+
+async function iniciar() {
+  perfil = await api('/perfil');
+  $('#login').classList.add('hidden'); $('#app').classList.remove('hidden');
+  $('#tTitulo').textContent = (perfil.programa || 'PULSE').toUpperCase(); document.title = perfil.programa;
+  $('#tMoedas').textContent = intf(perfil.coins);
+  $('#nav').innerHTML = ABAS.map(([k, n, i]) => `<button data-aba="${k}" class="${k === aba ? 'ativo' : ''}" aria-label="${n}">${i}<span>${n}</span></button>`).join('');
+  $('#nav').querySelectorAll('button').forEach((b) => b.onclick = () => { aba = b.dataset.aba; render(); });
+  await novidades();
+  render();
+}
+async function novidades() {
+  // Subiu de nível? (lembrado neste aparelho)
+  let ult = null; try { ult = Number(localStorage.getItem('pulse_nivel')); } catch (e) {}
+  if (ult && perfil.nivel.nivel > ult) await modal('SUBIU DE NÍVEL!', `<div class="celebra"><p class="px">NÍVEL ${perfil.nivel.nivel}</p><p class="big">${esc(perfil.nivel.nome)}</p><p>${intf(perfil.nivel.xp)} XP</p></div>`, [{ texto: 'BORA!' }]);
+  try { localStorage.setItem('pulse_nivel', perfil.nivel.nivel); } catch (e) {}
+  const n = await api('/novidades');
+  for (const c of n) await modal('NOVA CONQUISTA!', `<div class="celebra"><div class="card-c r-${c.raridade}"><p class="px">${RAR[c.raridade]}</p><p class="big">${esc(c.nome)}</p><p>${esc(c.descricao || '')}</p></div></div>`, [{ texto: 'OK' }]);
+  if (n.length) await api('/novidades/vistas', { method: 'POST' });
+}
+function render() {
+  $('#nav').querySelectorAll('button').forEach((b) => b.classList.toggle('ativo', b.dataset.aba === aba));
+  $('#tela').innerHTML = '<p class="muted">Carregando…</p>';
+  TELAS[aba]().catch((e) => { $('#tela').innerHTML = `<div class="caixa">${esc(e.message)}</div>`; });
+  window.scrollTo(0, 0);
+}
+
+async function extrato(cicloId, colabId) {
+  const e = await api(`/extrato/${cicloId}/${colabId}`);
+  const cores = { verde: 'var(--ok)', azul: '#4f8cff', amarelo: 'var(--gold)', vermelho: 'var(--red)' };
+  const soma = e.composicao.reduce((a, x) => a + x.valor, 0) || 1;
+  const html = `${e.previsao ? '<div class="aviso">Previsão — ainda pode mudar.</div>' : ''}
+    <div class="caixa" style="background:#3b1f73;border-color:#5a2f86"><h3 style="color:#d9c8ff">${e.previsao ? 'TOTAL PREVISTO' : 'TOTAL DO CICLO'}</h3><div class="big" style="font-size:22px;margin-top:8px">${brl(e.total)}</div>
+    <div class="muted" style="color:#d9c8ff">${e.posicao}º lugar · ${esc(e.ciclo)}</div></div>
+    <div class="comp">${e.composicao.map((x) => `<i style="width:${(x.valor / soma) * 100}%;background:${cores[x.cor]}"></i>`).join('')}</div>
+    <div class="leg">${e.composicao.map((x) => `<span><i style="background:${cores[x.cor]}"></i>${x.parte} ${brl(x.valor)}</span>`).join('')}</div>
+    ${e.blocos.map((b) => `<div class="bloco"><div class="linha" style="justify-content:space-between"><h3 style="color:var(--gold)">${esc(b.titulo).toUpperCase()}</h3><span>${b.valor === null ? '' : brl(b.valor)}</span></div>
+      <div class="muted">${esc(b.descricao)}</div>${[...b.resumo, ...b.itens].length ? `<ul>${[...b.resumo, ...b.itens].map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}<div class="conta">${esc(b.conta)}</div></div>`).join('')}
+    ${e.pagamento && e.pagamento.linhas.length ? `<div class="bloco"><h3 style="color:var(--gold)">PAGAMENTO</h3><div class="conta">${e.pagamento.linhas.map(esc).join('\n')}</div></div>` : ''}`;
+  await modal('EXTRATO — ' + e.colaborador, html);
+}
+
+const TELAS = {};
+TELAS.perfil = async () => {
+  perfil = await api('/perfil'); $('#tMoedas').textContent = intf(perfil.coins);
+  const m = perfil.mes; const nv = perfil.nivel;
+  $('#tela').innerHTML = `
+  <div class="caixa"><div class="linha"><div><h2 style="margin:0">${esc(perfil.nome)}</h2><div class="muted">Nível ${nv.nivel} · ${esc(nv.nome)}</div></div></div>
+    <div class="rot" style="margin-top:10px"><span>${intf(nv.xp)} XP</span><span>${nv.proximo ? `faltam ${intf(nv.faltam)} XP` : 'nível máximo'}</span></div>${barra(nv.pct, '#b07cff')}</div>
+  ${m ? `<div class="caixa"><h2>MÊS ${String(perfil.ciclo.mes).padStart(2, '0')}/${perfil.ciclo.ano} · ${m.posicao}º LUGAR</h2>
+    <div class="rot"><span>Vida</span><span>${pct(m.vida)}</span></div>${barra(m.vida, cor(m.vida))}
+    <div class="rot"><span>Pontualidade</span><span>${pct(m.pontualidade)}${m.dias_avaliados ? ` · ${m.dias_certos}/${m.dias_avaliados} dias` : ''}</span></div>${barra(m.pontualidade, cor(m.pontualidade))}
+    <div class="rot"><span>Execução</span><span>${pct(m.taxa)}${m.atribuidas ? ` · ${m.feitas}/${m.atribuidas}` : ''}</span></div>${barra(m.taxa, cor(m.taxa))}
+    <div class="rot" style="margin-top:8px"><span>Bônus previsto</span><span>${brl(m.total)} de ${brl(perfil.teto_total)}</span></div>${barra((m.total / perfil.teto_total) * 100)}
+    ${perfil.forma_pagamento === 'abono_consumo' ? `<p class="muted" style="margin:6px 0 0">O bônus vira consumo na loja que não é descontado do salário. Sem consumo, não vira dinheiro.${m.consumo !== null ? ` Consumo lançado: ${brl(m.consumo)} → abonado ${brl(m.abonado)}.` : ''}</p>` : ''}
+    <div style="margin-top:12px"><button class="btn full" id="bExt">VER MEU EXTRATO</button></div></div>`
+    : '<div class="caixa">Você ainda não está no ranking deste mês. Fale com a gestão.</div>'}
+  <div class="caixa"><h2>SEQUÊNCIA SEM ATRASO</h2><div class="linha" style="justify-content:space-around;text-align:center">
+    <div><div class="big">${perfil.sequencia_atual}</div><div class="muted">dias agora</div></div><div><div class="big">${perfil.maior_sequencia}</div><div class="muted">recorde</div></div>
+    <div><div class="big">${esc(perfil.conquistas)}</div><div class="muted">cards</div></div></div></div>
+  <div class="caixa"><h2>PRÓXIMOS CARDS</h2>${perfil.proximas.map((c) => `<div style="margin-bottom:8px"><div class="rot"><span>${esc(c.nome)}</span><span>${intf(c.atual)}/${intf(c.meta)} ${esc(c.unidade)}</span></div>${barra(c.pct, '#b07cff')}</div>`).join('') || '<p class="muted">Todos desbloqueados!</p>'}</div>
+  <button class="btn sec full" id="bSair">SAIR</button>`;
+  if ($('#bExt')) $('#bExt').onclick = tentar(() => extrato(perfil.ciclo.id, perfil.id));
+  $('#bSair').onclick = tentar(async () => { await api('/logout', { method: 'POST' }); mostrarLogin(); });
+};
+
+TELAS.rotinas = async () => {
+  const d = await api('/rotinas');
+  const feitas = d.linhas.filter((l) => l.status === 'feita').length;
+  $('#tela').innerHTML = `<div class="caixa"><h2>ROTINAS DE HOJE</h2><div class="rot"><span>${feitas}/${d.linhas.length} feitas</span><span>${d.linhas.length ? pct(feitas / d.linhas.length * 100) : '—'}</span></div>
+    ${barra(d.linhas.length ? feitas / d.linhas.length * 100 : 0, 'var(--ok)')}</div>
+    ${d.linhas.map((l) => `<div class="caixa" data-id="${l.id}"><div class="linha" style="justify-content:space-between"><h3 style="line-height:1.5">${esc(l.titulo).toUpperCase()}</h3>
+      <span class="${l.status === 'feita' ? '' : 'muted'}" style="color:${l.status === 'feita' ? 'var(--ok)' : ''}">${l.status === 'feita' ? 'FEITA' : 'pendente'}</span></div>
+      ${l.tipo === 'checklist' && l.itens.length ? l.itens.map((it, i) => `<label class="check"><input type="checkbox" data-i="${i}" ${l.itens_marcados.includes(i) ? 'checked' : ''}> ${esc(it)}</label>`).join('')
+        + barra((l.itens_marcados.length / l.itens.length) * 100, 'var(--ok)')
+        : `<div style="margin-top:10px"><button class="btn ${l.status === 'feita' ? 'sec' : ''}" data-concluir="${l.status === 'feita' ? 0 : 1}">${l.status === 'feita' ? 'DESFAZER' : 'CONCLUÍ'}</button></div>`}
+      <div class="muted" style="margin-top:4px">${l.pontos} pt${l.pontos > 1 ? 's' : ''} · ${l.tipo}</div></div>`).join('') || '<div class="caixa muted">Nenhuma rotina atribuída para hoje.</div>'}`;
+  $('#tela').querySelectorAll('.caixa[data-id]').forEach((cx) => {
+    const id = cx.dataset.id;
+    cx.querySelectorAll('input[data-i]').forEach((ch) => ch.onchange = tentar(async () => {
+      const itens = [...cx.querySelectorAll('input[data-i]:checked')].map((x) => Number(x.dataset.i));
+      const r = await api('/rotinas/' + id, { method: 'POST', body: { itens } }); if (r.feita) toast('Checklist concluído!'); render(); }));
+    const b = $('[data-concluir]', cx); if (b) b.onclick = tentar(async () => { await api('/rotinas/' + id, { method: 'POST', body: { concluir: b.dataset.concluir === '1' } }); render(); });
+  });
+};
+
+let cicloRk = null;
+TELAS.ranking = async () => {
+  const d = await api('/ranking' + (cicloRk ? `?ciclo=${cicloRk}` : ''));
+  $('#tela').innerHTML = `<div class="caixa"><div class="linha" style="justify-content:space-between"><h2 style="margin:0">RANKING</h2>
+    <select id="sc" style="background:#0a1430;color:var(--tx);border:2px solid var(--navy3);min-height:40px">${d.ciclos.map((c) => `<option value="${c.id}" ${c.id === d.ciclo.id ? 'selected' : ''}>${String(c.mes).padStart(2, '0')}/${c.ano}</option>`).join('')}</select></div>
+    <p class="muted">${d.fechado ? 'Mês fechado.' : 'Previsão do mês.'} Toque em alguém para ver o extrato.</p>
+    ${d.linhas.map((l) => `<div class="item ${l.eu ? 'eu' : ''}" data-c="${l.colaborador_id}" role="button" style="cursor:pointer;min-height:44px">
+      <span class="pos">${l.posicao}º</span><div style="flex:1"><div>${esc(l.nome)}${l.eu ? ' (você)' : ''}</div>
+      <div class="muted" style="font-size:17px">Vida ${pct(l.vida)} · Pont. ${pct(l.pontualidade)} · Exec. ${pct(l.taxa)}</div>${barra(l.vida, cor(l.vida))}</div>
+      <span style="color:var(--gold)">${brl(l.total)}</span></div>`).join('') || '<p class="muted">Ninguém no ranking ainda.</p>'}</div>`;
+  $('#sc').onchange = (e) => { cicloRk = Number(e.target.value); render(); };
+  $('#tela').querySelectorAll('[data-c]').forEach((el) => el.onclick = tentar(() => extrato(d.ciclo.id, Number(el.dataset.c))));
+};
+
+TELAS.conquistas = async () => {
+  const d = await api('/conquistas');
+  const ord = { lendaria: 0, epica: 1, rara: 2, comum: 3 };
+  const cards = [...d.cards].sort((a, b) => (b.desbloqueada - a.desbloqueada) || (ord[a.raridade] - ord[b.raridade]) || (b.pct - a.pct));
+  $('#tela').innerHTML = `<div class="caixa"><h2>CARDS ${d.desbloqueadas}/${d.total_cards}</h2>${barra(d.desbloqueadas / d.total_cards * 100, '#b07cff')}</div>
+    ${cards.map((c) => `<div class="card-c r-${c.raridade} ${c.desbloqueada ? '' : 'cad'}"><div class="linha" style="justify-content:space-between">
+      <h3 style="line-height:1.5">${esc(c.nome).toUpperCase()}</h3>${c.desbloqueada ? '<span style="color:var(--gold)">★</span>' : CAD.replace('<svg', '<svg width="20" height="20"')}</div>
+      <div class="muted" style="color:#d6dcff">${RAR[c.raridade]} · ${esc(c.regra)}</div>
+      ${c.desbloqueada ? '' : `<div class="rot" style="color:#d6dcff"><span>${intf(c.atual)}/${intf(c.meta)} ${esc(c.unidade)}</span><span>${n1(c.pct)}%</span></div>${barra(c.pct)}`}</div>`).join('')}`;
+};
+
+TELAS.loja = async () => {
+  const d = await api('/loja'); $('#tMoedas').textContent = intf(d.saldo);
+  $('#tela').innerHTML = `<div class="caixa"><h2>LOJA</h2><div class="rot"><span>Saldo</span><span style="color:var(--gold)">${intf(d.saldo)} moedas</span></div>
+    ${d.disponivel !== d.saldo ? `<div class="muted">${intf(d.saldo - d.disponivel)} reservadas em resgates pendentes</div>` : ''}<p class="muted">Moedas vêm das conquistas. Todo resgate passa por aprovação da gestão.</p></div>
+    ${d.produtos.map((p) => `<div class="caixa"><div class="linha" style="justify-content:space-between"><h3 style="line-height:1.5">${esc(p.nome).toUpperCase()}</h3><span style="color:var(--gold)">${intf(p.custo)}</span></div>
+      <div class="muted">${esc(p.descricao || '')}${p.estoque !== null ? ` · estoque: ${p.estoque}` : ''}</div>
+      ${barra(Math.min(100, d.disponivel / p.custo * 100))}<div class="rot"><span>${d.disponivel >= p.custo ? 'Dá para resgatar' : `faltam ${intf(p.custo - d.disponivel)} moedas`}</span></div>
+      <div style="margin-top:8px"><button class="btn" data-p="${p.id}" data-n="${esc(p.nome)}" ${d.disponivel >= p.custo && (p.estoque === null || p.estoque > 0) ? '' : 'disabled'}>RESGATAR</button></div></div>`).join('')}
+    <div class="caixa"><h2>MEUS RESGATES</h2>${d.resgates.map((r) => `<div class="item"><div style="flex:1">${esc(r.nome)}<div class="muted" style="font-size:17px">${new Date(r.criado_em).toLocaleDateString('pt-BR')}${r.motivo ? ' · ' + esc(r.motivo) : ''}</div></div>
+      <span style="color:${r.status === 'aprovado' ? 'var(--ok)' : r.status === 'recusado' ? 'var(--bad)' : 'var(--warn)'}">${r.status}</span></div>`).join('') || '<p class="muted">Nenhum ainda.</p>'}</div>`;
+  $('#tela').querySelectorAll('[data-p]').forEach((b) => b.onclick = tentar(async () => {
+    if (!await modal('RESGATAR?', `<p>${esc(b.dataset.n)}</p><p class="muted">As moedas ficam reservadas até a gestão aprovar.</p>`, [{ texto: 'CANCELAR', sec: true, valor: false }, { texto: 'CONFIRMAR', valor: true }])) return;
+    await api(`/loja/${b.dataset.p}/resgatar`, { method: 'POST' }); toast('Pedido enviado!'); render(); }));
+};
+
+TELAS.niveis = async () => {
+  const d = await api('/niveis');
+  $('#tela').innerHTML = `<div class="caixa"><h2>NÍVEIS</h2><p class="muted">XP nunca zera. Ganha com tarefas, checklists, dias sem atraso, avaliações positivas e, no fechamento do mês, com os pontos de rotina.</p>
+    ${d.niveis.map((n) => `<div class="item ${n.nivel === d.atual.nivel ? 'eu' : ''}"><span class="pos">${n.nivel}</span><div style="flex:1">${esc(n.nome)}</div>
+      <span class="${d.atual.xp >= n.xp_min ? '' : 'muted'}">${intf(n.xp_min)} XP</span></div>`).join('')}</div>`;
+};
+
+iniciar().catch(() => mostrarLogin());
+</script>
+</body>
+</html>

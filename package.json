@@ -1,0 +1,19 @@
+{
+  "name": "pulse-bonificacao",
+  "version": "1.0.0",
+  "description": "Programa de bonificação gamificado — China in Box Ponta Grossa",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test test/",
+    "demo": "node scripts/demo.js"
+  },
+  "dependencies": {
+    "express": "^4.22.3",
+    "pg": "^8.23.1"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pulse — Gamificação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--pri:#c8131b;--bg:#f6f6f6;--card:#fff;--tx:#222;--tx2:#7a7a7a;--ok:#27A84C;--warn:#ffb32f;--bad:#c8131b;--line:#e8e8e8;--azul:#2f6fdb;--roxo:#6a35c9;--amar:#e8a400;--r:12px}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--tx);font-family:Poppins,system-ui,sans-serif;font-size:14px}
+button,input,select,textarea{font-family:inherit;font-size:13px}
+.hidden{display:none!important}
+header{background:var(--card);border-bottom:1px solid var(--line);padding:14px 20px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+header h1{margin:0;font-size:19px;font-weight:700}header .sub{color:var(--tx2);font-size:12px}
+header .dir{margin-left:auto;display:flex;gap:10px;align-items:center;color:var(--tx2);font-size:13px}
+nav.abas{display:flex;gap:2px;overflow-x:auto;background:var(--card);border-bottom:1px solid var(--line);padding:0 12px}
+nav.abas a{display:flex;align-items:center;gap:6px;padding:12px 12px;color:var(--tx2);text-decoration:none;white-space:nowrap;border-bottom:3px solid transparent;font-weight:500}
+nav.abas a.ativa{color:var(--pri);border-color:var(--pri)}
+nav.abas svg{width:16px;height:16px}
+main{padding:20px;max-width:1500px;margin:0 auto}
+.card{background:var(--card);border-radius:var(--r);padding:16px;margin-bottom:16px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.card h2{margin:0 0 12px;font-size:15px;font-weight:600}
+.grid{display:grid;gap:12px}.g4{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}.g2{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+.kpi .v{font-size:24px;font-weight:700}.kpi .l{color:var(--tx2);font-size:12px}
+.tabela{overflow-x:auto}
+table{width:100%;border-collapse:collapse;background:var(--card)}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+th{font-size:12px;color:var(--tx2);font-weight:600;white-space:nowrap;background:#fafafa}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.total{color:var(--pri);font-weight:700}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:7px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-weight:500;color:var(--tx);min-height:34px}
+.btn.pri{background:var(--pri);border-color:var(--pri);color:#fff}.btn.sm{padding:4px 8px;min-height:28px;font-size:12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}.btn svg{width:15px;height:15px}
+.icone{border:0;background:none;cursor:pointer;color:var(--tx2);padding:6px;border-radius:8px}.icone:hover{background:#f0f0f0;color:var(--pri)}.icone svg{width:18px;height:18px}
+input,select,textarea{border:1px solid #d9d9d9;border-radius:8px;padding:7px 9px;background:#fff;color:var(--tx)}
+input:focus,select:focus,textarea:focus{outline:2px solid #f3c2c4;border-color:var(--pri)}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--tx2)}
+.linha{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.metric{min-width:150px}.metric .p{font-weight:700}.metric .s{color:var(--tx2);font-size:11px;margin:1px 0 4px}
+.bar{height:7px;background:#eee;border-radius:5px;overflow:hidden}.bar>i{display:block;height:100%;border-radius:5px}
+.verde{color:var(--ok)}.amarelo{color:#d99500}.vermelho{color:var(--bad)}
+.b-verde{background:var(--ok)}.b-amarelo{background:var(--warn)}.b-vermelho{background:var(--bad)}.b-azul{background:var(--azul)}.b-cinza{background:#bbb}.b-roxo{background:var(--roxo)}
+.pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.st-ok{background:#e4f6e9;color:#1d7f39}.st-alerta{background:#fff3da;color:#9a6a00}.st-faltando{background:#fde3e4;color:var(--pri)}.st-info{background:#e8eefc;color:#2f55a6}
+.aviso{background:#fff7e0;border:1px solid #ffe2a3;color:#7a5600;padding:10px 12px;border-radius:10px;font-size:13px;margin-bottom:12px}
+.vazio{color:var(--tx2);text-align:center;padding:30px}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;background:#f6f4fb;border-radius:8px;padding:8px 10px;margin-top:8px}
+.muted{color:var(--tx2);font-size:12px}
+/* modal */
+.fundo{position:fixed;inset:0;background:rgba(20,20,20,.45);display:flex;align-items:flex-start;justify-content:center;z-index:50;padding:30px 12px;overflow:auto}
+.modal{background:var(--card);border-radius:var(--r);width:min(720px,100%);max-height:calc(100vh - 60px);display:flex;flex-direction:column}
+.modal .cab{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}.modal .cab h3{margin:0;font-size:16px;flex:1}
+.modal .corpo{padding:16px;overflow:auto}.modal .pe{padding:12px 16px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:10px;z-index:80;font-size:13px;max-width:90vw}
+.toast.erro{background:var(--pri)}
+/* extrato */
+.ext-total{background:var(--roxo);color:#fff;border-radius:var(--r);padding:16px;margin-bottom:12px}
+.ext-total .l{font-size:12px;opacity:.85;letter-spacing:.06em}.ext-total .v{font-size:32px;font-weight:700}
+.comp{display:flex;height:14px;border-radius:7px;overflow:hidden;background:#eee;margin:6px 0}
+.legenda{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--tx2)}.legenda i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.bloco{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:10px}.bloco h4{margin:0 0 4px;font-size:14px;display:flex;justify-content:space-between}
+.bloco ul{margin:6px 0 0;padding-left:18px;font-size:12.5px}
+/* cards metas */
+.colab-card{border:1px solid var(--line);border-radius:var(--r);padding:14px;background:#fff}
+.ini{width:38px;height:38px;border-radius:50%;background:#fbe4e5;color:var(--pri);display:flex;align-items:center;justify-content:center;font-weight:700}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line)}.chk:last-child{border:0}
+.chk .n{margin-left:auto;font-weight:600;white-space:nowrap}
+#login{max-width:360px;margin:12vh auto}
+@media (max-width:700px){main{padding:12px}header{padding:12px}}
+</style>
+</head>
+<body>
+<div id="login" class="card hidden">
+  <h2 style="font-size:18px">Pulse — painel do gestor</h2>
+  <form id="fLogin" class="grid">
+    <label class="f">Login<input name="login" autocomplete="username" required></label>
+    <label class="f">Senha<input name="senha" type="password" autocomplete="current-password" required></label>
+    <button class="btn pri" type="submit">Entrar</button>
+  </form>
+</div>
+<div id="app" class="hidden">
+  <header>
+    <div><h1 id="titulo">Pulse — Gamificação</h1><div class="sub">Programa mensal de bonificação e progressão de colaboradores</div></div>
+    <div class="dir"><span id="cicloAtual"></span><select id="selCiclo" title="Ciclo exibido"></select><button class="btn sm" id="sair">Sair</button></div>
+  </header>
+  <nav class="abas" id="abas"></nav>
+  <main id="tela"></main>
+</div>
+<script>
+'use strict';
+const ICO = {
+  dash:'<path d="M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z"/>',
+  rank:'<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>',
+  metas:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+  ponto:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  rotinas:'<path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
+  registros:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h5"/>',
+  consumo:'<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/>',
+  colab:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  vinc:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+  conq:'<circle cx="12" cy="8" r="7"/><path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12"/>',
+  loja:'<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>',
+  resg:'<path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>',
+  aval:'<path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>',
+  hist:'<path d="M1 4v6h6M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>',
+  niveis:'<path d="M12 20V10M18 20V4M6 20v-4"/>',
+  config:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  olho:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+  x:'<path d="M18 6L6 18M6 6l12 12"/>', lixo:'<path d="M3 6h18M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4h6v2"/>',
+  edit:'<path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/>', refresh:'<path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>',
+  lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>', esq:'<path d="M15 18l-6-6 6-6"/>', dir:'<path d="M9 18l6-6-6-6"/>', mais:'<path d="M12 5v14M5 12h14"/>'
+};
+const svg = (k) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICO[k]}</svg>`;
+const ABAS = [
+  ['dashboard','Dashboard','dash'],['ranking','Ranking','rank'],['metas','Metas & Cards','metas'],['ponto','Ponto','ponto'],['rotinas','Rotinas','rotinas'],
+  ['registros','Registros','registros'],['consumo','Consumo','consumo'],['colaboradores','Colaboradores','colab'],['vinculos','Vínculos','vinc'],
+  ['conquistas','Conquistas','conq'],['loja','Loja','loja'],['resgates','Resgates','resg'],['avaliacoes','Avaliações','aval'],
+  ['historico','Histórico','hist'],['niveis','Níveis','niveis'],['configuracoes','Configurações','config']
+];
+const DIAS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const $ = (s, el = document) => el.querySelector(s);
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const n1 = (v) => v === null || v === undefined ? '—' : Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const pct = (v) => v === null || v === undefined ? '—' : n1(v) + '%';
+const brl = (v) => v === null || v === undefined ? '—' : 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const intf = (v) => Number(v || 0).toLocaleString('pt-BR');
+const faixa = (v) => v === null || v === undefined ? 'cinza' : v >= 95 ? 'verde' : v >= 85 ? 'amarelo' : 'vermelho';
+const dataBR = (iso) => iso ? iso.slice(8,10) + '/' + iso.slice(5,7) + '/' + iso.slice(0,4) : '';
+const quando = (ts) => ts ? new Date(ts).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : '';
+const mmaaaa = (c) => c ? String(c.mes).padStart(2,'0') + '/' + c.ano : '';
+const bar = (p, cor) => `<div class="bar"><i class="b-${cor || faixa(p)}" style="width:${Math.max(0, Math.min(100, p || 0))}%"></i></div>`;
+const iniciais = (nome) => nome.split(/\s+/).map((x) => x[0]).slice(0, 2).join('').toUpperCase();
+
+const S = { me: null, ciclo: null, ciclos: [] };
+
+async function api(url, opt = {}) {
+  const r = await fetch('/api/painel' + url, { method: opt.method || 'GET', headers: opt.body ? { 'Content-Type': 'application/json' } : {}, body: opt.body ? JSON.stringify(opt.body) : undefined, credentials: 'same-origin' });
+  const j = await r.json().catch(() => ({}));
+  if (r.status === 401) { mostrarLogin(); throw new Error(j.erro || 'Faça login'); }
+  if (!r.ok) throw new Error(j.erro || 'Erro ' + r.status);
+  return j;
+}
+function toast(msg, erro) { const t = document.createElement('div'); t.className = 'toast' + (erro ? ' erro' : ''); t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), erro ? 6000 : 2600); }
+const tentar = (fn) => async (...a) => { try { await fn(...a); } catch (e) { toast(e.message, true); } };
+
+function modal(titulo, corpo, botoes = []) {
+  return new Promise((resolve) => {
+    const f = document.createElement('div'); f.className = 'fundo';
+    f.innerHTML = `<div class="modal" role="dialog" aria-modal="true"><div class="cab"><h3>${esc(titulo)}</h3><button class="icone" data-x aria-label="Fechar">${svg('x')}</button></div>
+      <div class="corpo"></div><div class="pe"></div></div>`;
+    const c = $('.corpo', f); if (typeof corpo === 'string') c.innerHTML = corpo; else c.appendChild(corpo);
+    const pe = $('.pe', f); if (!botoes.length) pe.remove();
+    const fechar = (v) => { f.remove(); resolve(v); };
+    for (const b of botoes) { const el = document.createElement('button'); el.className = 'btn' + (b.pri ? ' pri' : ''); el.textContent = b.texto; el.onclick = async () => {
+      if (b.acao) { try { el.disabled = true; const r = await b.acao(f); if (r === false) { el.disabled = false; return; } fechar(r ?? true); } catch (e) { el.disabled = false; toast(e.message, true); } } else fechar(b.valor ?? false); }; pe.appendChild(el); }
+    $('[data-x]', f).onclick = () => fechar(false);
+    f.addEventListener('click', (e) => { if (e.target === f) fechar(false); });
+    const esc_ = (e) => { if (e.key === 'Escape' && document.body.lastElementChild === f) { document.removeEventListener('keydown', esc_); fechar(false); } };
+    document.addEventListener('keydown', esc_);
+    document.body.appendChild(f);
+  });
+}
+const confirmar = (titulo, texto, ok = 'Confirmar') => modal(titulo, `<p>${texto}</p>`, [{ texto: 'Cancelar', valor: false }, { texto: ok, pri: true, valor: true }]);
+const form = (el) => Object.fromEntries(new FormData(el).entries());
+
+// ---------------- boot ----------------
+function mostrarLogin() { $('#app').classList.add('hidden'); $('#login').classList.remove('hidden'); }
+$('#fLogin').onsubmit = tentar(async (e) => { e.preventDefault(); await api('/login', { method: 'POST', body: form(e.target) }); await iniciar(); });
+$('#sair').onclick = async () => { await api('/logout', { method: 'POST' }); mostrarLogin(); };
+$('#selCiclo').onchange = () => { S.ciclo = S.ciclos.find((c) => c.id === Number($('#selCiclo').value)); render(); };
+
+async function iniciar() {
+  S.me = await api('/me');
+  $('#login').classList.add('hidden'); $('#app').classList.remove('hidden');
+  $('#titulo').textContent = `${S.me.programa} — Gamificação`; document.title = `${S.me.programa} — Gamificação`;
+  $('#cicloAtual').textContent = 'Ciclo atual: ' + mmaaaa(S.me.ciclo_atual);
+  await carregarCiclos(S.me.ciclo_atual.id);
+  if (!location.hash.startsWith('#/colaboradores/pulse/')) location.hash = '#/colaboradores/pulse/dashboard'; else render();
+}
+async function carregarCiclos(selId) {
+  S.ciclos = await api('/ciclos');
+  S.ciclo = S.ciclos.find((c) => c.id === (selId || (S.ciclo && S.ciclo.id))) || S.ciclos[0];
+  $('#selCiclo').innerHTML = S.ciclos.map((c) => `<option value="${c.id}" ${c.id === S.ciclo.id ? 'selected' : ''}>${mmaaaa(c)} ${c.status === 'fechado' ? '(fechado)' : ''}</option>`).join('');
+}
+window.addEventListener('hashchange', render);
+function abaAtual() { return (location.hash.split('/')[3] || 'dashboard'); }
+function render() {
+  const aba = abaAtual();
+  $('#abas').innerHTML = ABAS.map(([k, n, i]) => `<a href="#/colaboradores/pulse/${k}" class="${k === aba ? 'ativa' : ''}">${svg(i)}${n}</a>`).join('');
+  $('#tela').innerHTML = '<div class="vazio">Carregando…</div>';
+  (TELAS[aba] || TELAS.dashboard)().catch((e) => { $('#tela').innerHTML = `<div class="card vazio">${esc(e.message)}</div>`; });
+}
+const cq = () => S.ciclo ? `?ciclo=${S.ciclo.id}` : '';
+
+// ---------------- extrato explicado ----------------
+async function abrirExtrato(colabId, cicloId, nome) {
+  const cont = document.createElement('div');
+  const desenhar = async (cid) => {
+    cont.innerHTML = '<div class="vazio">Carregando…</div>';
+    let e; try { e = await api(`/extrato/${cid}/${colabId}`); } catch (err) { cont.innerHTML = `<div class="vazio">${esc(err.message)}</div>`; return; }
+    const cores = { verde: 'var(--ok)', azul: 'var(--azul)', amarelo: 'var(--amar)', vermelho: 'var(--pri)' };
+    const soma = e.composicao.reduce((a, x) => a + x.valor, 0) || 1;
+    cont.innerHTML = `
+      <div class="linha" style="margin-bottom:10px"><label class="f">Ciclo<select id="extCiclo">${S.ciclos.map((c) => `<option value="${c.id}" ${c.id === cid ? 'selected' : ''}>${mmaaaa(c)}</option>`).join('')}</select></label>
+        <span class="muted" style="margin-left:auto">Calculado em ${quando(e.calculado_em)}</span>
+        <button class="btn sm" id="extRecalc" ${e.previsao ? '' : 'disabled'}>${svg('refresh')}Recomputar agora</button></div>
+      ${e.previsao ? '<div class="aviso">Previsão — ainda pode mudar. Recalcula todo dia de madrugada e a cada ajuste.</div>' : '<div class="aviso" style="background:#eef7f0;border-color:#cde8d4;color:#1d6b33">Ciclo fechado: valores gravados no fechamento.</div>'}
+      <div class="ext-total"><div class="l">${e.previsao ? 'TOTAL PREVISTO' : 'TOTAL DO CICLO'}</div><div class="v">${brl(e.total)}</div>
+        <div style="font-size:12px;opacity:.9">${e.posicao}º no ranking · ${esc(e.colaborador)}</div></div>
+      <div class="comp">${e.composicao.map((x) => `<i style="width:${(x.valor / soma) * 100}%;background:${cores[x.cor]}"></i>`).join('')}</div>
+      <div class="legenda">${e.composicao.map((x) => `<span><i style="background:${cores[x.cor]}"></i>${x.parte} ${brl(x.valor)}</span>`).join('')}</div>
+      ${e.blocos.map((b) => `<div class="bloco"><h4><span>${esc(b.titulo)}</span><span>${b.valor === null ? '' : brl(b.valor)}</span></h4>
+        <div class="muted">${esc(b.descricao)}</div>
+        ${b.resumo.length ? `<ul>${b.resumo.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+        ${b.itens.length ? `<ul>${b.itens.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+        <div class="mono">${esc(b.conta)}</div></div>`).join('')}
+      ${e.pagamento && e.pagamento.linhas.length ? `<div class="bloco"><h4><span>Pagamento (${e.pagamento.forma === 'abono_consumo' ? 'abono do consumo na loja' : 'dinheiro'})</span><span>${e.pagamento.abonado !== null && e.pagamento.abonado !== undefined ? brl(e.pagamento.abonado) : ''}</span></h4>
+        <div class="mono">${e.pagamento.linhas.map(esc).join('<br>')}</div></div>` : ''}`;
+    $('#extCiclo', cont).onchange = (ev) => desenhar(Number(ev.target.value));
+    $('#extRecalc', cont).onclick = tentar(async () => { await api(`/ciclos/${cid}/recalcular`, { method: 'POST' }); await desenhar(cid); toast('Recalculado'); });
+  };
+  desenhar(cicloId || S.ciclo.id);
+  await modal('Extrato explicado — ' + nome, cont);
+}
+
+// ---------------- telas ----------------
+const TELAS = {};
+
+TELAS.dashboard = async () => {
+  const d = await api('/dashboard' + cq());
+  const i = d.indicadores; const aberto = d.ciclo.status === 'aberto';
+  $('#tela').innerHTML = `
+  <div class="grid g4">
+    ${[['Colaboradores no ranking', i.colaboradores], ['Vida média', pct(i.vida_media)], ['Pontualidade média', pct(i.pontualidade_media)], ['Execução média', pct(i.execucao_media)],
+      ['Nota coletiva', pct(i.coletiva)], ['Bônus previsto (soma)', brl(i.total_previsto)], ['Abonado no consumo', brl(i.abonado)], ['Resgates pendentes', i.resgates_pendentes]]
+      .map(([l, v]) => `<div class="card kpi"><div class="l">${l}</div><div class="v">${v}</div></div>`).join('')}
+  </div>
+  <div class="card">
+    <div class="linha" style="margin-bottom:8px"><h2 style="margin:0">Checklist de fechamento — ${mmaaaa(d.ciclo)}</h2>
+      <span style="margin-left:auto"></span>
+      <button class="btn" id="bRecalc" ${aberto ? '' : 'disabled'}>${svg('refresh')}Recomputar</button>
+      <button class="btn pri" id="bFechar" ${aberto && !d.bloqueado ? '' : 'disabled'} title="${d.bloqueado ? 'Bloqueado: há itens faltando' : ''}">${svg('lock')}Fechar ciclo</button></div>
+    ${!aberto ? `<div class="aviso">Ciclo fechado em ${quando(d.ciclo.fechado_em)} por ${esc(d.ciclo.fechado_por)}.</div>` : ''}
+    ${d.checklist.map((c) => `<div class="chk"><span class="pill st-${c.status}">${c.status}</span><div><div>${esc(c.item)}</div>
+      <div class="muted">Fonte: ${esc(c.fonte)}${c.detalhe ? ' · ' + esc(c.detalhe) : ''}</div></div><div class="n">${c.numero === null ? '—' : esc(c.numero)}</div></div>`).join('')}
+  </div>`;
+  $('#bRecalc').onclick = tentar(async () => { await api(`/ciclos/${d.ciclo.id}/recalcular`, { method: 'POST' }); toast('Recalculado'); render(); });
+  $('#bFechar').onclick = tentar(async () => {
+    if (!await confirmar('Fechar ciclo ' + mmaaaa(d.ciclo), 'Grava o fechamento (valores e extratos ficam congelados), converte os pontos do mês em XP e abre o próximo mês. Não dá para desfazer.', 'Fechar ciclo')) return;
+    await api(`/ciclos/${d.ciclo.id}/fechar`, { method: 'POST' }); toast('Ciclo fechado'); await carregarCiclos(); render();
+  });
+};
+
+TELAS.ranking = async () => {
+  const d = await api('/ranking' + cq());
+  if (!d.linhas.length) { $('#tela').innerHTML = `<div class="card vazio">${d.ciclo ? 'Nenhum colaborador vinculado neste ciclo' : 'nenhum ciclo aberto'}</div>`; return; }
+  $('#tela').innerHTML = `<div class="card"><h2>Ranking — ${mmaaaa(d.ciclo)} ${d.fechado ? '(fechado)' : '(previsão)'}</h2>
+  <div class="muted" style="margin-bottom:8px">Ordem: Vida → Pontualidade → taxa de execução → pontos. O valor em R$ não define a posição.</div>
+  <div class="tabela"><table><thead><tr><th>#</th><th>Colaborador</th><th>Nível</th><th>Vida</th><th>Pontual.</th><th>Execução</th><th class="num">Coins</th><th>Conq.</th>
+  <th class="num">R$ Vida</th><th class="num">R$ Score</th><th class="num">R$ Coletiva</th><th class="num">Bônus</th><th class="num">Total R$</th><th></th></tr></thead><tbody>
+  ${d.linhas.map((l) => `<tr><td><b>${l.posicao}</b></td><td><b>${esc(l.nome)}</b></td>
+    <td class="metric"><div class="p">${esc(l.nivel.nome)}</div><div class="s">${intf(l.nivel.xp)} XP · faltam ${intf(l.nivel.faltam)}</div>${bar(l.nivel.pct, 'roxo')}</td>
+    <td class="metric"><div class="p ${faixa(l.vida)}">${pct(l.vida)}</div>${bar(l.vida)}</td>
+    <td class="metric"><div class="p ${faixa(l.pontualidade)}">${pct(l.pontualidade)}</div><div class="s">${l.pont_dias ? `${l.pont_dias.certos}/${l.pont_dias.avaliados} dias no horário · ${esc(l.pont_dias.motivo)}` : ''}</div>${bar(l.pontualidade)}</td>
+    <td class="metric"><div class="p ${faixa(l.taxa)}">${pct(l.taxa)}</div><div class="s">${l.atribuidas ? `${l.feitas}/${l.atribuidas} · ${l.score} pts` : 'nada atribuído'}</div>${bar(l.taxa)}</td>
+    <td class="num">${intf(l.coins)}</td><td>${l.conquistas}</td>
+    <td class="num">${brl(l.r_assiduidade)}</td><td class="num">${brl(l.r_score)}</td><td class="num">${brl(l.r_coletiva)}</td><td class="num">${brl(l.r_podio)}</td>
+    <td class="num total">${brl(l.total)}</td><td><button class="icone" data-ext="${l.colaborador_id}" data-nome="${esc(l.nome)}" title="Extrato explicado">${svg('olho')}</button></td></tr>`).join('')}
+  </tbody></table></div></div>`;
+  $('#tela').querySelectorAll('[data-ext]').forEach((b) => b.onclick = () => abrirExtrato(Number(b.dataset.ext), d.ciclo.id, b.dataset.nome));
+};
+
+TELAS.metas = async () => {
+  const d = await api('/metas');
+  const media = d.length ? d.reduce((a, x) => a + x.total_sem_atraso, 0) / d.length : 0;
+  $('#tela').innerHTML = `<div class="aviso">A sequência sem atraso pula folgas, feriados e dias sem registro; só quebra num dia com atraso (ou falta sem justificativa). Os marcadores são gravados para dias já passados.</div>
+  <div class="grid g4">${[['Cards desbloqueados', d.reduce((a, x) => a + x.desbloqueadas, 0)], ['Maior sequência', Math.max(0, ...d.map((x) => x.maior_sequencia)) + ' dias'],
+    ['Média de dias sem atraso', n1(media)], ['Colaboradores', d.length]].map(([l, v]) => `<div class="card kpi"><div class="l">${l}</div><div class="v">${v}</div></div>`).join('')}</div>
+  <div class="linha" style="margin-bottom:12px"><button class="btn" id="bRec">${svg('refresh')}Recomputar agora</button></div>
+  <div class="grid g2">${d.map((c) => {
+    const seq = c.cards.filter((x) => !x.desbloqueada && x.unidade === 'dias').sort((a, b) => b.pct - a.pct)[0];
+    return `<div class="colab-card"><div class="linha" style="align-items:center"><div class="ini">${iniciais(c.nome)}</div>
+      <div><b>${esc(c.nome)}</b><div class="muted">${esc(c.nivel.nome)} · ${intf(c.nivel.xp)} XP</div></div><span class="pill st-info" style="margin-left:auto">${c.desbloqueadas}/${c.total_cards} CARDS</span></div>
+      <div class="grid" style="grid-template-columns:1fr 1fr;margin:12px 0">
+        <div><div class="muted">Sequência sem atraso</div><div style="font-size:20px;font-weight:700">${c.sequencia_atual} dias</div></div>
+        <div><div class="muted">Total sem atraso</div><div style="font-size:20px;font-weight:700">${c.total_sem_atraso} dias</div></div></div>
+      ${seq ? `<div class="muted" style="margin-bottom:8px">faltam ${intf(seq.meta - seq.atual)} ${esc(seq.unidade)} p/ o card de ${esc(seq.nome)}</div>` : ''}
+      <div class="muted" style="font-weight:600;margin-bottom:6px">Cards em andamento — quanto falta</div>
+      ${c.em_andamento.slice(0, 5).map((x) => `<div style="margin-bottom:8px"><div class="linha" style="justify-content:space-between;font-size:12.5px"><span>${esc(x.nome)}</span>
+        <span class="muted">faltam ${intf(x.meta - x.atual)} ${esc(x.unidade)}</span></div>${bar(x.pct, 'roxo')}</div>`).join('') || '<div class="muted">Todos desbloqueados</div>'}
+    </div>`; }).join('') || '<div class="card vazio">Nenhum colaborador vinculado</div>'}</div>`;
+  $('#bRec').onclick = tentar(async () => { await api(`/ciclos/${S.me.ciclo_atual.id}/recalcular`, { method: 'POST' }); toast('Recalculado'); render(); });
+};
+
+// Ponto: marcações manuais + ocorrência do dia
+let diaPonto = null;
+TELAS.ponto = async () => {
+  const d = await api('/ponto' + (diaPonto ? `?data=${diaPonto}` : ''));
+  diaPonto = d.data;
+  const dow = new Date(d.data + 'T12:00:00').getDay();
+  const opts = (sel) => `<option value="">—</option>` + d.rotulos.map((r) => `<option value="${r.codigo}" ${sel === r.codigo ? 'selected' : ''}>${esc(r.nome)}</option>`).join('');
+  const t = (v) => esc(v || '');
+  $('#tela').innerHTML = `<div class="card"><div class="linha" style="margin-bottom:10px">
+    <h2 style="margin:0">Controle de ponto — lançamento manual</h2><span style="margin-left:auto"></span>
+    <button class="icone" id="pAnt" title="Dia anterior">${svg('esq')}</button><input type="date" id="pData" value="${d.data}"><span class="muted">${DIAS[dow]}</span>
+    <button class="icone" id="pProx" title="Próximo dia">${svg('dir')}</button></div>
+    <div class="muted" style="margin-bottom:10px">Dia sem marcação e sem ocorrência <b>não</b> é falta. Falta, atestado e sanção só existem se forem lançados aqui. Cada lançamento grava quem lançou e quando.</div>
+    ${d.ciclo_fechado ? '<div class="aviso">Este dia pertence a um ciclo fechado: lançamentos bloqueados.</div>' : ''}
+    <div class="tabela"><table><thead><tr><th>Colaborador</th><th>Previsto</th><th>Entrada</th><th>Saída int.</th><th>Retorno</th><th>Saída</th><th>Ocorrência do dia</th><th>Obs.</th><th></th></tr></thead><tbody>
+    ${d.linhas.map((l) => { const m = l.marcacao || {}; return `<tr data-id="${l.colaborador_id}">
+      <td><b>${esc(l.nome)}</b>${m.lancado_por ? `<div class="muted">por ${esc(m.atualizado_por || m.lancado_por)} em ${quando(m.atualizado_em || m.lancado_em)}</div>` : ''}</td>
+      <td>${l.previsto ? `${l.previsto.entrada}–${l.previsto.saida}<div class="muted">intervalo ${l.previsto.intervalo} min${l.previsto.excecao ? ' · exceção' : ''}</div>` : '<span class="muted">folga na escala</span>'}
+        <div><button class="btn sm" data-exc>${l.excecao ? 'Editar exceção' : 'Exceção do dia'}</button></div></td>
+      ${['entrada','saida_intervalo','retorno_intervalo','saida'].map((k) => `<td><input type="time" name="${k}" value="${t(m[k])}" style="width:104px"></td>`).join('')}
+      <td><select name="rotulo">${opts(l.rotulo && l.rotulo.rotulo)}</select></td>
+      <td><input name="observacao" value="${t(l.rotulo && l.rotulo.observacao)}" style="width:140px"></td>
+      <td><button class="btn pri sm" data-salvar ${d.ciclo_fechado ? 'disabled' : ''}>Salvar</button></td></tr>`; }).join('') || '<tr><td colspan="9" class="vazio">Nenhum colaborador vinculado</td></tr>'}
+    </tbody></table></div></div>`;
+  const ir = (n) => { const x = new Date(d.data + 'T12:00:00'); x.setDate(x.getDate() + n); diaPonto = x.toISOString().slice(0, 10); render(); };
+  $('#pAnt').onclick = () => ir(-1); $('#pProx').onclick = () => ir(1); $('#pData').onchange = (e) => { diaPonto = e.target.value; render(); };
+  $('#tela').querySelectorAll('tr[data-id]').forEach((tr) => {
+    const id = tr.dataset.id; const l = d.linhas.find((x) => String(x.colaborador_id) === id);
+    const btn = $('[data-salvar]', tr);
+    if (btn) btn.onclick = tentar(async () => {
+      const v = (n) => $(`[name=${n}]`, tr).value || null;
+      await api(`/ponto/${id}/${d.data}`, { method: 'PUT', body: { marcacao: { entrada: v('entrada'), saida_intervalo: v('saida_intervalo'), retorno_intervalo: v('retorno_intervalo'), saida: v('saida') },
+        rotulo: v('rotulo'), observacao: v('observacao') } });
+      toast('Salvo e recalculado'); render();
+    });
+    $('[data-exc]', tr).onclick = tentar(async () => {
+      const e = l.excecao || {}; const p = l.previsto || {};
+      const f = document.createElement('form'); f.className = 'grid';
+      f.innerHTML = `<div class="muted">A exceção autorizada substitui o previsto da escala só neste dia (troca de turno, reforço, saída antecipada combinada).</div>
+        <div class="linha"><label class="f">Entrada prevista<input type="time" name="entrada" value="${esc(e.entrada || p.entrada || '')}" required></label>
+        <label class="f">Saída prevista<input type="time" name="saida" value="${esc(e.saida || p.saida || '')}" required></label>
+        <label class="f">Intervalo (min)<input type="number" name="intervalo" value="${esc(e.intervalo || p.intervalo || 60)}" style="width:90px"></label></div>
+        <label class="f">Motivo (obrigatório)<input name="motivo" value="${esc(e.motivo || '')}" required></label>`;
+      const botoes = [{ texto: 'Cancelar' }];
+      if (l.excecao) botoes.push({ texto: 'Remover exceção', acao: async () => { await api(`/ponto/${id}/${d.data}`, { method: 'PUT', body: { excecao: null } }); } });
+      botoes.push({ texto: 'Salvar exceção', pri: true, acao: async () => { if (!f.reportValidity()) return false; await api(`/ponto/${id}/${d.data}`, { method: 'PUT', body: { excecao: form(f) } }); } });
+      if (await modal('Exceção do dia — ' + l.nome + ' — ' + dataBR(d.data), f, botoes)) { toast('Salvo'); render(); }
+    });
+  });
+};
+
+// Rotinas
+let diaRot = null;
+TELAS.rotinas = async () => {
+  const [d, colabs, at] = await Promise.all([api('/rotinas'), api('/colaboradores'), api('/atribuicoes' + (diaRot ? `?data=${diaRot}` : ''))]);
+  diaRot = at.data;
+  const ativos = colabs.filter((c) => c.ativo && c.identificador);
+  $('#tela').innerHTML = `
+  <div class="card"><div class="linha" style="margin-bottom:10px"><h2 style="margin:0">Rotinas (modelos)</h2><span style="margin-left:auto"></span><button class="btn pri" id="nRot">${svg('mais')}Nova rotina</button></div>
+    <div class="tabela"><table><thead><tr><th>Título</th><th>Tipo</th><th>Itens</th><th class="num">Pontos</th><th>Status</th><th></th></tr></thead><tbody>
+    ${d.rotinas.map((r) => `<tr><td><b>${esc(r.titulo)}</b></td><td>${r.tipo}</td><td class="muted">${r.itens.map(esc).join(' · ') || '—'}</td><td class="num">${r.pontos}</td>
+      <td>${r.ativo ? '<span class="pill st-ok">ativa</span>' : '<span class="pill st-info">inativa</span>'}</td><td><button class="icone" data-erot="${r.id}">${svg('edit')}</button></td></tr>`).join('') || '<tr><td colspan="6" class="vazio">Nenhuma rotina</td></tr>'}
+    </tbody></table></div></div>
+  <div class="card"><h2>Grade semanal (quem faz o quê, em que dia)</h2>
+    <form id="fGrade" class="linha" style="margin-bottom:12px">
+      <label class="f">Rotina<select name="rotina_id" required>${d.rotinas.filter((r) => r.ativo).map((r) => `<option value="${r.id}">${esc(r.titulo)}</option>`).join('')}</select></label>
+      <label class="f">Colaborador<select name="colaborador_id" required>${ativos.map((c) => `<option value="${c.id}">${esc(c.nome)}</option>`).join('')}</select></label>
+      <div class="f"><span class="muted">Dias</span><div class="linha">${DIAS.map((x, i) => `<label><input type="checkbox" name="d${i}" value="${i}"> ${x}</label>`).join('')}</div></div>
+      <button class="btn pri" type="submit">Adicionar</button></form>
+    <div class="tabela"><table><thead><tr><th>Colaborador</th><th>Rotina</th><th>Dia</th><th></th></tr></thead><tbody>
+    ${d.grade.map((g) => `<tr><td>${esc(g.nome)}</td><td>${esc(g.titulo)}</td><td>${DIAS[g.dia_semana]}</td><td><button class="icone" data-dgrade="${g.id}">${svg('lixo')}</button></td></tr>`).join('') || '<tr><td colspan="4" class="vazio">Grade vazia</td></tr>'}
+    </tbody></table></div></div>
+  <div class="card"><div class="linha" style="margin-bottom:10px"><h2 style="margin:0">Atribuídas no dia</h2><span style="margin-left:auto"></span>
+    <input type="date" id="rData" value="${at.data}"><button class="btn" id="nAv">${svg('mais')}Atribuição avulsa</button></div>
+    <div class="muted" style="margin-bottom:8px">Geradas automaticamente pela grade. Rotina de dia com ausência lançada (folga, atestado…) não conta na taxa. Correções feitas aqui ficam registradas.</div>
+    <div class="tabela"><table><thead><tr><th>Colaborador</th><th>Rotina</th><th>Progresso</th><th>Status</th><th></th></tr></thead><tbody>
+    ${at.linhas.map((a) => `<tr><td>${esc(a.nome)}</td><td>${esc(a.titulo)} <span class="muted">(${a.tipo}${a.origem === 'avulsa' ? ', avulsa' : ''})</span></td>
+      <td>${a.tipo === 'checklist' ? `${a.itens_marcados.length}/${a.itens_rotina.length}` : '—'}</td>
+      <td>${a.status === 'feita' ? '<span class="pill st-ok">feita</span>' : '<span class="pill st-alerta">pendente</span>'}</td>
+      <td><button class="btn sm" data-tog="${a.id}" data-st="${a.status}" data-n="${a.itens_rotina.length}" data-tipo="${a.tipo}">${a.status === 'feita' ? 'Desmarcar' : 'Marcar feita'}</button>
+        <button class="icone" data-dat="${a.id}" title="Remover atribuição">${svg('lixo')}</button></td></tr>`).join('') || '<tr><td colspan="5" class="vazio">Nada atribuído neste dia</td></tr>'}
+    </tbody></table></div></div>`;
+  const editarRot = async (r) => {
+    const f = document.createElement('form'); f.className = 'grid';
+    f.innerHTML = `<label class="f">Título<input name="titulo" value="${esc(r ? r.titulo : '')}" required></label>
+      <div class="linha"><label class="f">Tipo<select name="tipo" ${r ? 'disabled' : ''}><option value="tarefa">tarefa</option><option value="checklist" ${r && r.tipo === 'checklist' ? 'selected' : ''}>checklist</option></select></label>
+      <label class="f">Pontos<input type="number" name="pontos" min="1" value="${r ? r.pontos : 1}" style="width:90px"></label>
+      ${r ? `<label class="f">Ativa<select name="ativo"><option value="1">sim</option><option value="0" ${r.ativo ? '' : 'selected'}>não</option></select></label>` : ''}</div>
+      <label class="f">Itens do checklist (um por linha)<textarea name="itens" rows="6">${esc(r ? r.itens.join('\n') : '')}</textarea></label>`;
+    const ok = await modal(r ? 'Editar rotina' : 'Nova rotina', f, [{ texto: 'Cancelar' }, { texto: 'Salvar', pri: true, acao: async () => {
+      if (!f.reportValidity()) return false; const v = form(f);
+      if (r) await api('/rotinas/' + r.id, { method: 'PUT', body: { ...v, ativo: v.ativo !== '0' } }); else await api('/rotinas', { method: 'POST', body: v }); } }]);
+    if (ok) render();
+  };
+  $('#nRot').onclick = tentar(() => editarRot(null));
+  $('#tela').querySelectorAll('[data-erot]').forEach((b) => b.onclick = tentar(() => editarRot(d.rotinas.find((r) => r.id === Number(b.dataset.erot)))));
+  $('#fGrade').onsubmit = tentar(async (e) => { e.preventDefault(); const v = form(e.target); const dias = Object.keys(v).filter((k) => /^d\d$/.test(k)).map((k) => Number(v[k]));
+    if (!dias.length) throw new Error('Marque ao menos um dia'); await api('/grade', { method: 'POST', body: { rotina_id: v.rotina_id, colaborador_id: v.colaborador_id, dias } }); render(); });
+  $('#tela').querySelectorAll('[data-dgrade]').forEach((b) => b.onclick = tentar(async () => { await api('/grade/' + b.dataset.dgrade, { method: 'DELETE' }); render(); }));
+  $('#rData').onchange = (e) => { diaRot = e.target.value; render(); };
+  $('#tela').querySelectorAll('[data-tog]').forEach((b) => b.onclick = tentar(async () => {
+    const feita = b.dataset.st === 'feita'; const n = Number(b.dataset.n);
+    const body = b.dataset.tipo === 'checklist' && n ? { itens: feita ? [] : Array.from({ length: n }, (_, i) => i) } : { concluir: !feita };
+    await api(`/atribuicoes/${b.dataset.tog}/marcar`, { method: 'POST', body }); render(); }));
+  $('#tela').querySelectorAll('[data-dat]').forEach((b) => b.onclick = tentar(async () => {
+    if (!await confirmar('Remover atribuição', 'A rotina deixa de contar na taxa de execução desta pessoa neste dia.', 'Remover')) return;
+    await api('/atribuicoes/' + b.dataset.dat, { method: 'DELETE' }); render(); }));
+  $('#nAv').onclick = tentar(async () => {
+    const f = document.createElement('form'); f.className = 'grid';
+    f.innerHTML = `<label class="f">Rotina<select name="rotina_id">${d.rotinas.filter((r) => r.ativo).map((r) => `<option value="${r.id}">${esc(r.titulo)}</option>`).join('')}</select></label>
+      <label class="f">Colaborador<select name="colaborador_id">${ativos.map((c) => `<option value="${c.id}">${esc(c.nome)}</option>`).join('')}</select></label>
+      <label class="f">Data<input type="date" name="data" value="${at.data}"></label>`;
+    if (await modal('Atribuição avulsa', f, [{ texto: 'Cancelar' }, { texto: 'Atribuir', pri: true, acao: async () => api('/atribuicoes', { method: 'POST', body: form(f) }) }])) render();
+  });
+};
+
+TELAS.registros = async () => {
+  const d = await api('/registros' + cq()); const cid = d.ciclo.id; const ab = d.ciclo.status === 'aberto';
+  const pernas = (d.coletiva && d.coletiva.fontes_detalhe) || [];
+  const recarregar = () => render();
+  $('#tela').innerHTML = `
+  <div class="card"><h2>Nota coletiva — ${mmaaaa(d.ciclo)}: <span class="${faixa(d.coletiva && d.coletiva.percentual_final)}">${pct(d.coletiva && d.coletiva.percentual_final)}</span></h2>
+    <div class="muted" style="margin-bottom:8px">Igual para toda a equipe. Perna sem lançamento é excluída e o peso se redistribui. Zero erros lançados = não medido (confirme abaixo se o mês foi medido e não teve erro).</div>
+    <div class="tabela"><table><thead><tr><th>Perna</th><th>Valor</th><th>Peso nominal</th><th>Peso efetivo</th><th>Fonte</th></tr></thead><tbody>
+    ${pernas.map((p) => `<tr><td>${esc(p.nome)}</td><td>${p.medida ? pct(p.valor) : '<span class="pill st-faltando">não medida</span>'}</td><td>${n1(p.peso_nominal)}%</td><td>${n1(p.peso_efetivo)}%</td><td class="muted">${esc(p.fonte)}</td></tr>`).join('')}
+    </tbody></table></div></div>
+  <div class="grid g2">
+  <div class="card"><h2>Plataformas de delivery (nota pública)</h2>
+    <div class="muted" style="margin-bottom:8px">Copie a nota pública da loja na plataforma. A pesquisa própria da loja não substitui: só responde quem está satisfeito.</div>
+    <form id="fPlat" class="linha"><label class="f">Plataforma<input name="plataforma" value="iFood" required style="width:110px"></label>
+      <label class="f">Nota (0–5)<input name="nota" type="number" step="0.01" min="0" max="5" required style="width:90px"></label>
+      <label class="f">Nº avaliações<input name="amostra" type="number" min="0" style="width:100px"></label>
+      <label class="f">Fonte<input name="fonte" placeholder="ex.: página da loja em 30/10"></label><button class="btn pri" ${ab ? '' : 'disabled'}>Lançar</button></form>
+    <table style="margin-top:10px"><tbody>${d.plataformas.map((p) => `<tr><td>${esc(p.plataforma)}</td><td>${n1(p.nota)}/5</td><td class="muted">${p.amostra || ''} ${esc(p.fonte || '')} · ${esc(p.lancado_por)}</td>
+      <td><button class="icone" data-dplat="${esc(p.plataforma)}" ${ab ? '' : 'disabled'}>${svg('lixo')}</button></td></tr>`).join('')}</tbody></table></div>
+  <div class="card"><h2>Auditoria própria / Higieniza</h2>
+    <form id="fAud" class="linha"><label class="f">Data<input type="date" name="data" required></label>
+      <label class="f">Tipo<select name="tipo"><option value="propria">própria</option><option value="higieniza">Higieniza</option></select></label>
+      <label class="f">Nota (0–100)<input name="nota" type="number" step="0.1" min="0" max="100" required style="width:90px"></label>
+      <label class="f">Descrição<input name="descricao"></label><button class="btn pri" ${ab ? '' : 'disabled'}>Lançar</button></form>
+    <table style="margin-top:10px"><tbody>${d.auditorias.map((a) => `<tr><td>${dataBR(a.data)}</td><td>${a.tipo === 'higieniza' ? 'Higieniza' : 'própria'}</td><td>${n1(a.nota)}%</td><td class="muted">${esc(a.descricao || '')}</td>
+      <td><button class="icone" data-daud="${a.id}" ${ab ? '' : 'disabled'}>${svg('lixo')}</button></td></tr>`).join('')}</tbody></table></div>
+  <div class="card"><h2>Erros operacionais</h2>
+    <form id="fErro" class="linha"><label class="f">Data<input type="date" name="data" required></label><label class="f" style="flex:1">Descrição<input name="descricao" required></label>
+      <button class="btn pri" ${ab ? '' : 'disabled'}>Lançar</button></form>
+    <label style="display:flex;gap:8px;align-items:center;margin:10px 0"><input type="checkbox" id="cErros" ${d.erros_confirmados ? 'checked' : ''} ${ab ? '' : 'disabled'}>
+      O mês foi medido (lançamento de erros feito) ${d.erros_confirmados ? `<span class="muted">— confirmado por ${esc(d.erros_confirmados.confirmado_por)}</span>` : ''}</label>
+    <table><tbody>${d.erros.map((e) => `<tr><td>${dataBR(e.data)}</td><td>${esc(e.descricao)}</td><td class="muted">${esc(e.lancado_por)}</td>
+      <td><button class="icone" data-derro="${e.id}" ${ab ? '' : 'disabled'}>${svg('lixo')}</button></td></tr>`).join('')}</tbody></table></div>
+  </div>`;
+  $('#fPlat').onsubmit = tentar(async (e) => { e.preventDefault(); await api(`/registros/${cid}/plataformas`, { method: 'POST', body: form(e.target) }); recarregar(); });
+  $('#fAud').onsubmit = tentar(async (e) => { e.preventDefault(); await api(`/registros/${cid}/auditorias`, { method: 'POST', body: form(e.target) }); recarregar(); });
+  $('#fErro').onsubmit = tentar(async (e) => { e.preventDefault(); await api(`/registros/${cid}/erros`, { method: 'POST', body: form(e.target) }); recarregar(); });
+  $('#cErros').onchange = tentar(async (e) => { await api(`/registros/${cid}/erros-confirmados`, { method: 'POST', body: { confirmar: e.target.checked } }); recarregar(); });
+  $('#tela').querySelectorAll('[data-dplat]').forEach((b) => b.onclick = tentar(async () => { await api(`/registros/${cid}/plataformas/${encodeURIComponent(b.dataset.dplat)}`, { method: 'DELETE' }); recarregar(); }));
+  $('#tela').querySelectorAll('[data-daud]').forEach((b) => b.onclick = tentar(async () => { await api(`/registros/${cid}/auditorias/${b.dataset.daud}`, { method: 'DELETE' }); recarregar(); }));
+  $('#tela').querySelectorAll('[data-derro]').forEach((b) => b.onclick = tentar(async () => { await api(`/registros/${cid}/erros/${b.dataset.derro}`, { method: 'DELETE' }); recarregar(); }));
+};
+
+TELAS.consumo = async () => {
+  const d = await api('/consumo' + cq()); const ab = d.ciclo.status === 'aberto';
+  $('#tela').innerHTML = `<div class="card"><h2>Consumo do mês na loja — ${mmaaaa(d.ciclo)}</h2>
+    <div class="muted" style="margin-bottom:10px">Valor já com o desconto de funcionário, tirado do PDV. O bônus abate esse consumo: abonado = menor entre o bônus e o consumo; o resto é descontado em folha. Bônus sem consumo não vira dinheiro. Lance 0 para quem não consumiu.</div>
+    <div class="tabela"><table><thead><tr><th>Colaborador</th><th>Consumo (R$)</th><th class="num">Bônus previsto</th><th class="num">Abonado</th><th class="num">Desconto em folha</th><th>Lançado por</th></tr></thead><tbody>
+    ${d.linhas.map((l) => `<tr><td><b>${esc(l.nome)}</b></td><td><input type="number" step="0.01" min="0" value="${l.consumo ?? ''}" data-cons="${l.colaborador_id}" style="width:120px" ${ab ? '' : 'disabled'}></td>
+      <td class="num">${brl(l.total)}</td><td class="num total">${brl(l.abonado)}</td><td class="num">${brl(l.desconto_folha)}</td><td class="muted">${esc(l.lancado_por || '')} ${quando(l.lancado_em)}</td></tr>`).join('')}
+    </tbody></table></div></div>`;
+  $('#tela').querySelectorAll('[data-cons]').forEach((i) => i.onchange = tentar(async () => {
+    await api(`/consumo/${d.ciclo.id}/${i.dataset.cons}`, { method: 'PUT', body: { consumo: i.value === '' ? null : i.value } }); toast('Salvo'); render(); }));
+};
+
+TELAS.colaboradores = async () => {
+  const d = await api('/colaboradores');
+  $('#tela').innerHTML = `<div class="card"><div class="linha" style="margin-bottom:10px"><h2 style="margin:0">Colaboradores</h2><span style="margin-left:auto"></span><button class="btn pri" id="nCol">${svg('mais')}Novo colaborador</button></div>
+    <div class="tabela"><table><thead><tr><th>Nome</th><th>Matrícula</th><th>Cargo</th><th>Admissão</th><th>Escala vigente</th><th>App</th><th>Status</th><th></th></tr></thead><tbody>
+    ${d.map((c) => `<tr><td><b>${esc(c.nome)}</b></td><td>${esc(c.matricula)}</td><td>${esc(c.cargo || '')}</td><td>${dataBR(c.admissao)}</td>
+      <td class="muted">${c.escala ? `desde ${dataBR(c.escala.vigente_desde)} · ` + Object.entries(c.escala.dias).filter(([, v]) => v).map(([k, v]) => `${DIAS[k]} ${v.entrada}–${v.saida}`).join(', ') : '<span class="pill st-alerta">sem escala</span>'}</td>
+      <td>${c.tem_pin ? '<span class="pill st-ok">PIN ok</span>' : '<span class="pill st-alerta">sem PIN</span>'}</td>
+      <td>${c.ativo ? '<span class="pill st-ok">ativo</span>' : '<span class="pill st-info">inativo</span>'}</td>
+      <td><button class="icone" data-ecol="${c.id}" title="Editar">${svg('edit')}</button></td></tr>`).join('') || '<tr><td colspan="8" class="vazio">Nenhum colaborador</td></tr>'}
+    </tbody></table></div></div>`;
+  $('#nCol').onclick = tentar(async () => {
+    const f = document.createElement('form'); f.className = 'grid';
+    f.innerHTML = `<label class="f">Nome<input name="nome" required></label><div class="linha"><label class="f">Matrícula (login do app)<input name="matricula" required></label>
+      <label class="f">Cargo<input name="cargo"></label><label class="f">Admissão<input type="date" name="admissao" required></label></div>`;
+    if (await modal('Novo colaborador', f, [{ texto: 'Cancelar' }, { texto: 'Criar', pri: true, acao: async () => { if (!f.reportValidity()) return false; await api('/colaboradores', { method: 'POST', body: form(f) }); } }])) render();
+  });
+  $('#tela').querySelectorAll('[data-ecol]').forEach((b) => b.onclick = tentar(async () => {
+    const c = d.find((x) => x.id === Number(b.dataset.ecol));
+    const vers = await api(`/colaboradores/${c.id}/escalas`); const atual = vers[0] ? vers[0].dias : {};
+    const hoje = new Date().toISOString().slice(0, 10);
+    const f = document.createElement('div');
+    f.innerHTML = `<form id="fc" class="grid"><label class="f">Nome<input name="nome" value="${esc(c.nome)}" required></label>
+      <div class="linha"><label class="f">Matrícula<input name="matricula" value="${esc(c.matricula)}" required></label><label class="f">Cargo<input name="cargo" value="${esc(c.cargo || '')}"></label>
+      <label class="f">Admissão<input type="date" name="admissao" value="${c.admissao}" required></label>
+      <label class="f">Status<select name="ativo"><option value="1">ativo</option><option value="0" ${c.ativo ? '' : 'selected'}>inativo</option></select></label></div>
+      <div><button class="btn pri" type="submit">Salvar dados</button></div></form>
+      <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
+      <form id="fp" class="linha"><label class="f">PIN do app (4–8 dígitos)<input name="pin" inputmode="numeric" pattern="\\d{4,8}" required></label><button class="btn" type="submit">Definir PIN</button></form>
+      <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
+      <form id="fe"><b>Escala semanal (horário previsto)</b><div class="muted" style="margin:4px 0 8px">Mudar a escala cria uma nova versão a partir da data escolhida: dias anteriores mantêm o previsto antigo. Para um dia só, use “Exceção do dia” no Ponto.</div>
+      <label class="f" style="max-width:200px">Vale a partir de<input type="date" name="vigente_desde" value="${hoje}" required></label>
+      <table style="margin-top:8px"><thead><tr><th>Dia</th><th>Trabalha</th><th>Entrada</th><th>Saída</th><th>Intervalo (min)</th></tr></thead><tbody>
+      ${DIAS.map((x, i) => { const v = atual[i] || null; return `<tr><td>${x}</td><td><input type="checkbox" name="t${i}" ${v ? 'checked' : ''}></td>
+        <td><input type="time" name="e${i}" value="${v ? v.entrada : ''}"></td><td><input type="time" name="s${i}" value="${v ? v.saida : ''}"></td>
+        <td><input type="number" name="i${i}" value="${v ? v.intervalo : 60}" style="width:80px"></td></tr>`; }).join('')}</tbody></table>
+      <div style="margin-top:8px"><button class="btn pri" type="submit">Salvar nova versão da escala</button></div>
+      ${vers.length ? `<div class="muted" style="margin-top:8px">Versões: ${vers.map((v) => `desde ${dataBR(v.vigente_desde)} (${esc(v.criado_por)})`).join(' · ')}</div>` : ''}</form>`;
+    $('#fc', f).onsubmit = tentar(async (e) => { e.preventDefault(); const v = form(e.target); await api('/colaboradores/' + c.id, { method: 'PUT', body: { ...v, ativo: v.ativo !== '0' } }); toast('Salvo'); });
+    $('#fp', f).onsubmit = tentar(async (e) => { e.preventDefault(); await api(`/colaboradores/${c.id}/pin`, { method: 'POST', body: form(e.target) }); toast('PIN definido'); e.target.reset(); });
+    $('#fe', f).onsubmit = tentar(async (e) => { e.preventDefault(); const v = form(e.target); const dias = {};
+      for (let i = 0; i < 7; i++) dias[i] = v['t' + i] ? { entrada: v['e' + i], saida: v['s' + i], intervalo: Number(v['i' + i] || 60) } : null;
+      await api(`/colaboradores/${c.id}/escalas`, { method: 'POST', body: { vigente_desde: v.vigente_desde, dias } }); toast('Escala salva e ciclo recalculado'); });
+    await modal('Editar — ' + c.nome, f); render();
+  }));
+};
+
+TELAS.vinculos = async () => {
+  const d = await api('/vinculos');
+  $('#tela').innerHTML = `<div class="card"><h2>Vínculos com a fonte de horário</h2>
+    <div class="muted" style="margin-bottom:10px">Fonte atual: <b>${esc(S.me.fonte_horario)}</b>. Sem vínculo, o colaborador fica fora do ranking. No lançamento manual, use a matrícula como identificador; numa futura integração com relógio, troque pelo CPF ou código do relógio.</div>
+    <div class="tabela"><table><thead><tr><th>Colaborador</th><th>Matrícula</th><th>Status</th><th>Identificador</th><th></th></tr></thead><tbody>
+    ${d.map((c) => `<tr><td><b>${esc(c.nome)}</b></td><td>${esc(c.matricula)}</td><td>${c.ativo ? 'ativo' : '<span class="pill st-alerta">inativo</span>'}</td>
+      <td>${c.identificador ? esc(c.identificador) : `<input data-ident="${c.id}" value="${esc(c.matricula)}" style="width:140px">`}</td>
+      <td>${c.identificador ? `<button class="btn sm" data-desv="${c.id}">Desvincular</button>` : `<button class="btn pri sm" data-vinc="${c.id}">Vincular</button>`}</td></tr>`).join('')}
+    </tbody></table></div></div>`;
+  $('#tela').querySelectorAll('[data-vinc]').forEach((b) => b.onclick = tentar(async () => {
+    await api('/vinculos', { method: 'POST', body: { colaborador_id: b.dataset.vinc, identificador: $(`[data-ident="${b.dataset.vinc}"]`).value } }); render(); }));
+  $('#tela').querySelectorAll('[data-desv]').forEach((b) => b.onclick = tentar(async () => {
+    if (!await confirmar('Desvincular', 'A pessoa sai do ranking do ciclo aberto.', 'Desvincular')) return; await api('/vinculos/' + b.dataset.desv, { method: 'DELETE' }); render(); }));
+};
+
+TELAS.conquistas = async () => {
+  const d = await api('/conquistas');
+  const RAR = { comum: 'Comum', rara: 'Rara', epica: 'Épica', lendaria: 'Lendária' };
+  $('#tela').innerHTML = `<div class="card"><div class="linha" style="margin-bottom:10px"><h2 style="margin:0">Conquistas</h2><span style="margin-left:auto"></span>
+    <button class="btn pri" id="nCq" ${S.me.perfil === 'admin' ? '' : 'disabled title="Só admin"'}>${svg('mais')}Nova conquista</button></div>
+    <div class="muted" style="margin-bottom:8px">Moedas por raridade: ${Object.entries(d.moedas).map(([k, v]) => `${RAR[k]} ${v}`).join(' · ')}. "Mês sem falta" e "% de Vida" só contam meses completos (novato não ganha conquista vazia).</div>
+    <div class="tabela"><table><thead><tr><th>Nome</th><th>Regra</th><th>Raridade</th><th class="num">Desbloqueios</th><th>Status</th><th></th></tr></thead><tbody>
+    ${d.conquistas.map((q) => `<tr><td><b>${esc(q.nome)}</b><div class="muted">${esc(q.descricao || '')}</div></td><td>${esc(q.regra)}</td><td>${RAR[q.raridade]}</td><td class="num">${q.desbloqueios}</td>
+      <td>${q.ativo ? '<span class="pill st-ok">ativa</span>' : '<span class="pill st-info">inativa</span>'}</td><td><button class="icone" data-ecq="${q.id}" ${S.me.perfil === 'admin' ? '' : 'disabled'}>${svg('edit')}</button></td></tr>`).join('')}
+    </tbody></table></div></div>`;
+  const editar = async (q) => {
+    const f = document.createElement('form'); f.className = 'grid';
+    f.innerHTML = `<label class="f">Nome<input name="nome" value="${esc(q ? q.nome : '')}" required></label><label class="f">Descrição<input name="descricao" value="${esc(q ? q.descricao || '' : '')}"></label>
+      <div class="linha"><label class="f">Tipo de condição<select name="tipo">${d.tipos.map((t) => `<option value="${t.tipo}" ${q && q.tipo === t.tipo ? 'selected' : ''}>${esc(t.nome)}</option>`).join('')}</select></label>
+      <label class="f">Meta (<span id="un"></span>)<input type="number" name="meta" min="0" step="any" value="${q ? q.meta : ''}" required style="width:110px"></label>
+      <label class="f">Raridade<select name="raridade">${Object.entries(RAR).map(([k, v]) => `<option value="${k}" ${q && q.raridade === k ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+      ${q ? `<label class="f">Status<select name="ativo"><option value="1">ativa</option><option value="0" ${q.ativo ? '' : 'selected'}>inativa</option></select></label>` : ''}</div>`;
+    const un = () => { $('#un', f).textContent = d.tipos.find((t) => t.tipo === $('[name=tipo]', f).value).unidade; };
+    $('[name=tipo]', f).onchange = un; un();
+    if (await modal(q ? 'Editar conquista' : 'Nova conquista', f, [{ texto: 'Cancelar' }, { texto: 'Salvar', pri: true, acao: async () => {
+      if (!f.reportValidity()) return false; const v = form(f);
+      if (q) await api('/conquistas/' + q.id, { method: 'PUT', body: { ...v, ativo: v.ativo !== '0' } }); else await api('/conquistas', { method: 'POST', body: v }); } }])) render();
+  };
+  $('#nCq').onclick = tentar(() => editar(null));
+  $('#tela').querySelectorAll('[data-ecq]').forEach((b) => b.onclick = tentar(() => editar(d.conquistas.find((q) => q.id === Number(b.dataset.ecq)))));
+};
+
+TELAS.loja = async () => {
+  const d = await api('/loja'); const adm = S.me.perfil === 'admin';
+  $('#tela').innerHTML = `<div class="card"><div class="linha" style="margin-bottom:10px"><h2 style="margin:0">Loja de prêmios (moedas)</h2><span style="margin-left:auto"></span>
+    <button class="btn pri" id="nPr" ${adm ? '' : 'disabled'}>${svg('mais')}Novo prêmio</button></div>
+    <div class="muted" style="margin-bottom:8px">Moedas vêm das conquistas e saem aqui. Todo resgate passa por aprovação; com estoque, a aprovação baixa uma unidade.</div>
+    <div class="tabela"><table><thead><tr><th>Prêmio</th><th class="num">Custo</th><th class="num">Estoque</th><th>Status</th><th></th></tr></thead><tbody>
+    ${d.map((p) => `<tr><td><b>${esc(p.nome)}</b><div class="muted">${esc(p.descricao || '')}</div></td><td class="num">${intf(p.custo)}</td><td class="num">${p.estoque === null ? '—' : p.estoque}</td>
+      <td>${p.ativo ? '<span class="pill st-ok">ativo</span>' : '<span class="pill st-info">inativo</span>'}</td><td><button class="icone" data-epr="${p.id}" ${adm ? '' : 'disabled'}>${svg('edit')}</button></td></tr>`).join('')}
+    </tbody></table></div></div>`;
+  const editar = async (p) => {
+    const f = document.createElement('form'); f.className = 'grid';
+    f.innerHTML = `<label class="f">Nome<input name="nome" value="${esc(p ? p.nome : '')}" required></label><label class="f">Descrição<input name="descricao" value="${esc(p ? p.descricao || '' : '')}"></label>
+      <div class="linha"><label class="f">Custo (moedas)<input type="number" name="custo" min="1" value="${p ? p.custo : ''}" required></label>
+      <label class="f">Estoque (vazio = sem controle)<input type="number" name="estoque" min="0" value="${p && p.estoque !== null ? p.estoque : ''}"></label>
+      ${p ? `<label class="f">Status<select name="ativo"><option value="1">ativo</option><option value="0" ${p.ativo ? '' : 'selected'}>inativo</option></select></label>` : ''}</div>`;
+    if (await modal(p ? 'Editar prêmio' : 'Novo prêmio', f, [{ texto: 'Cancelar' }, { texto: 'Salvar', pri: true, acao: async () => {
+      if (!f.reportValidity()) return false; const v = form(f);
+      if (p) await api('/loja/' + p.id, { method: 'PUT', body: { ...v, ativo: v.ativo !== '0' } }); else await api('/loja', { method: 'POST', body: v }); } }])) render();
+  };
+  $('#nPr').onclick = tentar(() => editar(null));
+  $('#tela').querySelectorAll('[data-epr]').forEach((b) => b.onclick = tentar(() => editar(d.find((p) => p.id === Number(b.dataset.epr)))));
+};
+
+TELAS.resgates = async () => {
+  const d = await api('/resgates');
+  $('#tela').innerHTML = `<div class="card"><h2>Fila de resgates</h2><div class="tabela"><table><thead><tr><th>Quando</th><th>Colaborador</th><th>Prêmio</th><th class="num">Custo</th><th class="num">Saldo</th><th>Status</th><th></th></tr></thead><tbody>
+    ${d.map((r) => `<tr><td>${quando(r.criado_em)}</td><td>${esc(r.nome)}</td><td>${esc(r.produto)}</td><td class="num">${intf(r.custo)}</td><td class="num">${intf(r.saldo)}</td>
+      <td><span class="pill ${r.status === 'pendente' ? 'st-alerta' : r.status === 'aprovado' ? 'st-ok' : 'st-info'}">${r.status}</span>${r.decidido_por ? `<div class="muted">${esc(r.decidido_por)} ${quando(r.decidido_em)}</div>` : ''}</td>
+      <td>${r.status === 'pendente' ? `<button class="btn pri sm" data-ap="${r.id}">Aprovar</button> <button class="btn sm" data-rc="${r.id}">Recusar</button>` : ''}</td></tr>`).join('') || '<tr><td colspan="7" class="vazio">Nenhum resgate</td></tr>'}
+    </tbody></table></div></div>`;
+  $('#tela').querySelectorAll('[data-ap]').forEach((b) => b.onclick = tentar(async () => { await api(`/resgates/${b.dataset.ap}/aprovar`, { method: 'POST', body: {} }); toast('Aprovado'); render(); }));
+  $('#tela').querySelectorAll('[data-rc]').forEach((b) => b.onclick = tentar(async () => {
+    const f = document.createElement('form'); f.innerHTML = '<label class="f">Motivo (aparece para o colaborador)<input name="motivo"></label>';
+    if (await modal('Recusar resgate', f, [{ texto: 'Cancelar' }, { texto: 'Recusar', pri: true, acao: () => api(`/resgates/${b.dataset.rc}/recusar`, { method: 'POST', body: form(f) }) }])) render(); }));
+};
+
+TELAS.avaliacoes = async () => {
+  const [d, colabs] = await Promise.all([api('/avaliacoes'), api('/colaboradores')]);
+  $('#tela').innerHTML = `<div class="card"><h2>Avaliações</h2>
+    <form id="fAv" class="linha" style="margin-bottom:12px"><label class="f">Colaborador<select name="colaborador_id">${colabs.filter((c) => c.ativo).map((c) => `<option value="${c.id}">${esc(c.nome)}</option>`).join('')}</select></label>
+      <label class="f">Data<input type="date" name="data" value="${new Date().toISOString().slice(0, 10)}" required></label>
+      <label class="f">Tipo<select name="positiva"><option value="1">positiva (+XP)</option><option value="">registro de melhoria</option></select></label>
+      <label class="f" style="flex:1">Comentário<input name="comentario" required></label><button class="btn pri">Registrar</button></form>
+    <div class="tabela"><table><thead><tr><th>Data</th><th>Colaborador</th><th>Tipo</th><th>Comentário</th><th>Autor</th></tr></thead><tbody>
+    ${d.map((a) => `<tr><td>${dataBR(a.data)}</td><td>${esc(a.nome)}</td><td>${a.positiva ? '<span class="pill st-ok">positiva</span>' : '<span class="pill st-info">melhoria</span>'}</td><td>${esc(a.comentario || '')}</td><td class="muted">${esc(a.autor)}</td></tr>`).join('') || '<tr><td colspan="5" class="vazio">Nenhuma avaliação</td></tr>'}
+    </tbody></table></div></div>`;
+  $('#fAv').onsubmit = tentar(async (e) => { e.preventDefault(); const v = form(e.target); await api('/avaliacoes', { method: 'POST', body: { ...v, positiva: !!v.positiva } }); toast('Registrado'); render(); });
+};
+
+TELAS.historico = async () => {
+  const d = await api('/historico');
+  $('#tela').innerHTML = `<div class="card"><h2>Ciclos fechados</h2><div class="tabela"><table><thead><tr><th>Ciclo</th><th>Fechado em</th><th>Por</th><th class="num">Pessoas</th><th class="num">Bônus total</th><th class="num">Abonado</th><th></th></tr></thead><tbody>
+    ${d.map((c) => `<tr><td><b>${mmaaaa(c)}</b></td><td>${quando(c.fechado_em)}</td><td>${esc(c.fechado_por)}</td><td class="num">${c.pessoas}</td><td class="num">${brl(c.total)}</td><td class="num total">${brl(c.abonado)}</td>
+      <td><button class="btn sm" data-ver="${c.id}">Ver ranking</button></td></tr>`).join('') || '<tr><td colspan="7" class="vazio">Nenhum ciclo fechado ainda</td></tr>'}
+    </tbody></table></div></div>`;
+  $('#tela').querySelectorAll('[data-ver]').forEach((b) => b.onclick = () => { S.ciclo = S.ciclos.find((c) => c.id === Number(b.dataset.ver)); $('#selCiclo').value = S.ciclo.id; location.hash = '#/colaboradores/pulse/ranking'; });
+};
+
+TELAS.niveis = async () => {
+  const d = await api('/niveis'); const adm = S.me.perfil === 'admin';
+  $('#tela').innerHTML = `<div class="card"><h2>Níveis (XP acumulado, nunca zera)</h2>
+    <div class="muted" style="margin-bottom:8px">XP: tarefa, checklist, avaliação positiva, dia sem atraso e, no fechamento, os pontos de rotina do mês (1:1).</div>
+    <form id="fNv"><table><thead><tr><th>Nível</th><th>Nome</th><th>XP mínimo</th></tr></thead><tbody>
+    ${d.map((n, i) => `<tr><td>${n.nivel}</td><td><input name="n${i}" value="${esc(n.nome)}" ${adm ? '' : 'disabled'}></td><td><input type="number" name="x${i}" value="${n.xp_min}" ${adm && i ? '' : 'disabled'} style="width:120px"></td></tr>`).join('')}
+    </tbody></table><div style="margin-top:10px"><button class="btn pri" ${adm ? '' : 'disabled'}>Salvar níveis</button></div></form></div>`;
+  $('#fNv').onsubmit = tentar(async (e) => { e.preventDefault(); const v = form(e.target);
+    await api('/niveis', { method: 'PUT', body: d.map((n, i) => ({ nome: v['n' + i], xp_min: i ? Number(v['x' + i]) : 0 })) }); toast('Níveis salvos'); render(); });
+};
+
+TELAS.configuracoes = async () => {
+  const d = await api('/configuracoes'); const adm = S.me.perfil === 'admin';
+  const grupos = [...new Set(d.map((c) => c.grupo))];
+  const campo = (c) => {
+    const dis = adm ? '' : 'disabled';
+    if (c.tipo === 'booleano') return `<select name="${c.chave}" ${dis}><option value="true">sim</option><option value="false" ${c.valor ? '' : 'selected'}>não</option></select>`;
+    if (c.tipo === 'numero') return `<input type="number" step="any" name="${c.chave}" value="${esc(c.valor)}" ${dis} style="width:120px">`;
+    if (c.tipo === 'lista') return `<input name="${c.chave}" value="${esc(c.valor.join(', '))}" ${dis} placeholder="60, 40, 20">`;
+    if (c.tipo === 'objeto') return Object.entries(c.valor).map(([k, v]) => `<label class="f" style="display:inline-flex;margin-right:8px">${esc(k)}<input type="number" step="any" name="${c.chave}.${k}" value="${esc(v)}" ${dis} style="width:90px"></label>`).join('');
+    return `<input name="${c.chave}" value="${esc(c.valor)}" ${dis} style="width:260px">`;
+  };
+  $('#tela').innerHTML = `${adm ? '' : '<div class="aviso">Somente o perfil admin altera configurações.</div>'}
+    <div class="aviso">Mudanças valem para os ciclos abertos (recalculados na hora). Ciclos fechados não mudam.</div>
+    <form id="fCfg">${grupos.map((g) => `<div class="card"><h2>${esc(g)}</h2><table><tbody>${d.filter((c) => c.grupo === g).map((c) => `<tr><td style="width:45%"><div>${esc(c.descricao)}</div><div class="muted">${c.chave}</div></td><td>${campo(c)}</td></tr>`).join('')}</tbody></table></div>`).join('')}
+    <button class="btn pri" ${adm ? '' : 'disabled'}>Salvar configurações</button></form>
+    ${adm ? `<div class="card" style="margin-top:16px" id="usuarios"></div>` : ''}`;
+  $('#fCfg').onsubmit = tentar(async (e) => {
+    e.preventDefault(); const v = form(e.target); const out = {};
+    for (const c of d) {
+      if (c.tipo === 'objeto') { out[c.chave] = {}; for (const k of Object.keys(c.valor)) out[c.chave][k] = Number(v[`${c.chave}.${k}`]); }
+      else if (c.tipo === 'numero') out[c.chave] = Number(v[c.chave]);
+      else if (c.tipo === 'booleano') out[c.chave] = v[c.chave] === 'true';
+      else if (c.tipo === 'lista') out[c.chave] = String(v[c.chave]).split(',').map((x) => Number(x.trim())).filter((x) => !isNaN(x));
+      else out[c.chave] = v[c.chave];
+    }
+    if (!await confirmar('Salvar configurações', 'Os ciclos abertos serão recalculados com os novos valores.', 'Salvar')) return;
+    await api('/configuracoes', { method: 'PUT', body: out }); toast('Configurações salvas'); render();
+  });
+  if (adm) {
+    const u = await api('/usuarios');
+    $('#usuarios').innerHTML = `<h2>Usuários do painel</h2><table><tbody>${u.map((x) => `<tr><td>${esc(x.nome)}</td><td>${esc(x.login)}</td><td>${x.perfil}</td><td>${x.ativo ? 'ativo' : 'inativo'}</td></tr>`).join('')}</tbody></table>
+      <form id="fUs" class="linha" style="margin-top:10px"><label class="f">Nome<input name="nome" required></label><label class="f">Login<input name="login" required></label>
+      <label class="f">Senha (mín. 8)<input type="password" name="senha" minlength="8" required></label><label class="f">Perfil<select name="perfil"><option value="gestor">gestor</option><option value="admin">admin</option></select></label>
+      <button class="btn pri">Criar usuário</button></form>`;
+    $('#fUs').onsubmit = tentar(async (e) => { e.preventDefault(); await api('/usuarios', { method: 'POST', body: form(e.target) }); toast('Usuário criado'); render(); });
+  }
+};
+
+iniciar().catch(() => mostrarLogin());
+</script>
+</body>
+</html>
